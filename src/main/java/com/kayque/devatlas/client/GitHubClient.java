@@ -10,7 +10,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.beans.factory.annotation.Value;
+import com.kayque.devatlas.dto.GitHubReadmeResponse;
 
+import java.util.Optional;
 import java.util.List;
 
 @Component
@@ -107,4 +109,34 @@ public class GitHubClient {
             );
         }
     }
+
+    public Optional<GitHubReadmeResponse> findReadme(
+            String owner,
+            String repository
+    ) {
+        try {
+            GitHubReadmeResponse readme =
+                    restClient
+                            .get()
+                            .uri(
+                                    "/repos/{owner}/{repository}/readme",
+                                    owner,
+                                    repository
+                            )
+                            .retrieve()
+                            .body(GitHubReadmeResponse.class);
+
+            return Optional.ofNullable(readme);
+
+        } catch (HttpClientErrorException.NotFound exception) {
+            return Optional.empty();
+
+        } catch (RestClientException exception) {
+            throw new GitHubApiUnavailableException(
+                    owner,
+                    exception
+            );
+        }
+    }
+
 }

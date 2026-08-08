@@ -3,10 +3,12 @@ package com.kayque.devatlas.controller;
 import com.kayque.devatlas.client.GitHubClient;
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
+import com.kayque.devatlas.dto.GitHubReadmeResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -33,4 +35,18 @@ public class GitHubController {
     ) {
         return gitHubClient.findRepositories(username);
     }
+
+    @GetMapping("/repositories/{owner}/{repository}/readme")
+    public ResponseEntity<GitHubReadmeResponse> findReadme(
+            @PathVariable String owner,
+            @PathVariable String repository
+    ) {
+        return gitHubClient
+                .findReadme(owner, repository)
+                .map(ResponseEntity::ok)
+                .orElseGet(() ->
+                        ResponseEntity.notFound().build()
+                );
+    }
+
 }
