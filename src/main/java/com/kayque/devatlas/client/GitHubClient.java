@@ -1,14 +1,19 @@
 package com.kayque.devatlas.client;
 
 import com.kayque.devatlas.dto.GitHubUserResponse;
+import com.kayque.devatlas.exception.GitHubApiUnavailableException;
+import com.kayque.devatlas.exception.GitHubUserNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 @Component
 public class GitHubClient {
 
-    private static final String GITHUB_API_URL = "https://api.github.com";
+    private static final String GITHUB_API_URL =
+            "https://api.github.com";
 
     private final RestClient restClient;
 
@@ -31,10 +36,21 @@ public class GitHubClient {
     }
 
     public GitHubUserResponse findUser(String username) {
-        return restClient
-                .get()
-                .uri("/users/{username}", username)
-                .retrieve()
-                .body(GitHubUserResponse.class);
+        try {
+            return restClient
+                    .get()
+                    .uri("/users/{username}", username)
+                    .retrieve()
+                    .body(GitHubUserResponse.class);
+
+        } catch (HttpClientErrorException.NotFound exception) {
+            throw new GitHubUserNotFoundException(username);
+
+        } catch (RestClientException exception) {
+            throw new GitHubApiUnavailableException(
+                    username,
+                    exception
+            );
+        }
     }
 }

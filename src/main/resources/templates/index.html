@@ -75,6 +75,24 @@
             O DevAtlas utiliza somente informações públicas.
         </p>
 
+        <div
+                class="error-message"
+                th:if="${errorMessage != null}"
+                role="alert"
+        >
+            <span class="error-symbol">!</span>
+
+            <div>
+                <strong th:text="${errorTitle}">
+                    Não foi possível analisar
+                </strong>
+
+                <p th:text="${errorMessage}">
+                    Ocorreu um erro durante a análise.
+                </p>
+            </div>
+        </div>
+
     </section>
 
     <section
