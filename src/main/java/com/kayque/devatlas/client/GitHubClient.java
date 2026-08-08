@@ -1,5 +1,6 @@
 package com.kayque.devatlas.client;
 
+import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
 import com.kayque.devatlas.exception.GitHubApiUnavailableException;
 import com.kayque.devatlas.exception.GitHubUserNotFoundException;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+
+import java.util.List;
 
 @Component
 public class GitHubClient {
@@ -42,6 +45,45 @@ public class GitHubClient {
                     .uri("/users/{username}", username)
                     .retrieve()
                     .body(GitHubUserResponse.class);
+
+        } catch (HttpClientErrorException.NotFound exception) {
+            throw new GitHubUserNotFoundException(username);
+
+        } catch (RestClientException exception) {
+            throw new GitHubApiUnavailableException(
+                    username,
+                    exception
+            );
+        }
+    }
+
+    public List<GitHubRepositoryResponse> findRepositories(
+            String username
+    ) {
+        try {
+            GitHubRepositoryResponse[] repositories =
+                    restClient
+                            .get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(
+                                            "/users/{username}/repos"
+                                    )
+                                    .queryParam("type", "owner")
+                                    .queryParam("sort", "updated")
+                                    .queryParam("direction", "desc")
+                                    .queryParam("per_page", 100)
+                                    .build(username)
+                            )
+                            .retrieve()
+                            .body(
+                                    GitHubRepositoryResponse[].class
+                            );
+
+            if (repositories == null) {
+                return List.of();
+            }
+
+            return List.of(repositories);
 
         } catch (HttpClientErrorException.NotFound exception) {
             throw new GitHubUserNotFoundException(username);
