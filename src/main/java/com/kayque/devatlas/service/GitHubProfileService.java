@@ -3,8 +3,10 @@ package com.kayque.devatlas.service;
 import com.kayque.devatlas.client.GitHubClient;
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
+import com.kayque.devatlas.dto.GitHubReadmeResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.List;
 
 @Service
@@ -33,4 +35,15 @@ public class GitHubProfileService {
                 .filter(repository -> !repository.fork())
                 .toList();
     }
+
+    public Optional<GitHubReadmeResponse> findReadme(
+            String owner,
+            String repository
+    ) {
+        return gitHubClient.findReadme(
+                owner,
+                repository
+        );
+    }
+
 }

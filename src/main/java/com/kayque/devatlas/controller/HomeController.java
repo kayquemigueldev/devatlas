@@ -67,9 +67,18 @@ public class HomeController {
                         );
 
         List<RepositoryAnalysis> repositoryAnalyses =
-                repositoryAnalysisService.analyze(
-                        repositories
-                );
+                repositories
+                        .stream()
+                        .map(repository ->
+                                repositoryAnalysisService.analyze(
+                                        repository,
+                                        gitHubProfileService.findReadme(
+                                                normalizedUsername,
+                                                repository.name()
+                                        )
+                                )
+                        )
+                        .toList();
 
         ProfileAnalysis profileAnalysis =
                 profileAnalysisService.analyze(

@@ -1,5 +1,6 @@
 package com.kayque.devatlas.service;
 
+import com.kayque.devatlas.dto.GitHubReadmeResponse;
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.model.RepositoryScoreLevel;
@@ -9,6 +10,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RepositoryAnalysisService {
@@ -25,13 +27,29 @@ public class RepositoryAnalysisService {
     public RepositoryAnalysis analyze(
             GitHubRepositoryResponse repository
     ) {
-        int score = calculateScore(repository);
+        return analyze(
+                repository,
+                Optional.empty()
+        );
+    }
+
+    public RepositoryAnalysis analyze(
+            GitHubRepositoryResponse repository,
+            Optional<GitHubReadmeResponse> readme
+    ) {
+        int score = calculateScore(
+                repository,
+                readme
+        );
 
         RepositoryScoreLevel level =
                 RepositoryScoreLevel.fromScore(score);
 
         List<String> recommendations =
-                createRecommendations(repository);
+                createRecommendations(
+                        repository,
+                        readme
+                );
 
         return new RepositoryAnalysis(
                 repository,
@@ -42,12 +60,13 @@ public class RepositoryAnalysisService {
     }
 
     private int calculateScore(
-            GitHubRepositoryResponse repository
+            GitHubRepositoryResponse repository,
+            Optional<GitHubReadmeResponse> readme
     ) {
         int score = 0;
 
         if (hasText(repository.description())) {
-            score += 20;
+            score += 15;
         }
 
         int topicCount = repository.topics() == null
@@ -55,13 +74,13 @@ public class RepositoryAnalysisService {
                 : repository.topics().size();
 
         if (topicCount >= 3) {
-            score += 20;
+            score += 15;
         } else if (topicCount > 0) {
-            score += 10;
+            score += 8;
         }
 
         if (hasText(repository.homepage())) {
-            score += 15;
+            score += 10;
         }
 
         if (hasText(repository.language())) {
@@ -75,6 +94,8 @@ public class RepositoryAnalysisService {
         score += calculateActivityScore(
                 repository.pushedAt()
         );
+
+        score += calculateReadmeScore(readme);
 
         return score;
     }
@@ -90,26 +111,41 @@ public class RepositoryAnalysisService {
         );
 
         if (daysSinceLastPush <= 30) {
-            return 25;
-        }
-
-        if (daysSinceLastPush <= 90) {
             return 20;
         }
 
-        if (daysSinceLastPush <= 180) {
+        if (daysSinceLastPush <= 90) {
             return 15;
         }
 
-        if (daysSinceLastPush <= 365) {
+        if (daysSinceLastPush <= 180) {
             return 10;
         }
 
-        return 5;
+        if (daysSinceLastPush <= 365) {
+            return 5;
+        }
+
+        return 0;
+    }
+
+    private int calculateReadmeScore(
+            Optional<GitHubReadmeResponse> readme
+    ) {
+        if (readme.isEmpty()) {
+            return 0;
+        }
+
+        if (readme.get().size() >= 1000) {
+            return 20;
+        }
+
+        return 10;
     }
 
     private List<String> createRecommendations(
-            GitHubRepositoryResponse repository
+            GitHubRepositoryResponse repository,
+            Optional<GitHubReadmeResponse> readme
     ) {
         List<String> recommendations =
                 new ArrayList<>();
@@ -154,6 +190,16 @@ public class RepositoryAnalysisService {
         )) {
             recommendations.add(
                     "Atualize o projeto para demonstrar manutenção."
+            );
+        }
+
+        if (readme.isEmpty()) {
+            recommendations.add(
+                    "Adicione um README para documentar o projeto."
+            );
+        } else if (readme.get().size() < 1000) {
+            recommendations.add(
+                    "Amplie o README com instalação, uso e tecnologias."
             );
         }
 
