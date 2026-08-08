@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DevAtlas — GitHub Profile Analyzer</title>
+
+    <link
+            rel="stylesheet"
+            th:href="@{/css/style.css}"
+            href="/css/style.css"
+    >
+</head>
+
+<body>
+
+<header class="topbar">
+    <a href="/" class="brand">
+        <span class="brand-symbol">DA</span>
+        <span>DevAtlas</span>
+    </a>
+
+    <span class="product-label">
+        GitHub Intelligence
+    </span>
+</header>
+
+<main class="container">
+
+    <section class="hero">
+
+        <p class="eyebrow">
+            Intelligent GitHub Profile Analyzer
+        </p>
+
+        <h1>
+            Transforme seu GitHub em um mapa de evolução.
+        </h1>
+
+        <p class="hero-description">
+            Analise seu perfil, descubra seus pontos fortes
+            e encontre oportunidades para melhorar seus projetos.
+        </p>
+
+        <form
+                class="search-form"
+                th:action="@{/analisar}"
+                method="get"
+        >
+            <label for="username" class="sr-only">
+                Usuário do GitHub
+            </label>
+
+            <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    th:value="${username}"
+                    placeholder="Digite um usuário do GitHub"
+                    autocomplete="off"
+                    required
+            >
+
+            <button type="submit">
+                Analisar perfil
+            </button>
+        </form>
+
+        <p class="search-hint">
+            O DevAtlas utiliza somente informações públicas.
+        </p>
+
+    </section>
+
+    <section
+            class="profile-card"
+            th:if="${user != null}"
+    >
+
+        <div class="profile-header">
+
+            <img
+                    class="avatar"
+                    th:src="${user.avatarUrl}"
+                    th:alt="|Avatar de ${user.login}|"
+                    src=""
+                    alt="Avatar do GitHub"
+            >
+
+            <div class="profile-identity">
+
+                <p class="profile-label">
+                    Perfil encontrado
+                </p>
+
+                <h2
+                        th:text="${user.name != null
+                        and !#strings.isEmpty(user.name)
+                        ? user.name
+                        : user.login}"
+                >
+                    Nome do usuário
+                </h2>
+
+                <p
+                        class="username"
+                        th:text="|@${user.login}|"
+                >
+                    @usuario
+                </p>
+
+                <p
+                        class="bio"
+                        th:if="${user.bio != null
+                        and !#strings.isEmpty(user.bio)}"
+                        th:text="${user.bio}"
+                >
+                    Biografia do usuário
+                </p>
+
+                <p
+                        class="location"
+                        th:if="${user.location != null
+                        and !#strings.isEmpty(user.location)}"
+                        th:text="|Localização: ${user.location}|"
+                >
+                    Localização
+                </p>
+
+                <a
+                        class="github-link"
+                        th:href="${user.profileUrl}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                >
+                    Abrir perfil no GitHub
+                </a>
+
+            </div>
+        </div>
+
+        <div class="metrics">
+
+            <article class="metric">
+                <span
+                        class="metric-value"
+                        th:text="${user.publicRepos}"
+                >
+                    0
+                </span>
+
+                <span class="metric-label">
+                    Repositórios
+                </span>
+            </article>
+
+            <article class="metric">
+                <span
+                        class="metric-value"
+                        th:text="${user.followers}"
+                >
+                    0
+                </span>
+
+                <span class="metric-label">
+                    Seguidores
+                </span>
+            </article>
+
+            <article class="metric">
+                <span
+                        class="metric-value"
+                        th:text="${user.following}"
+                >
+                    0
+                </span>
+
+                <span class="metric-label">
+                    Seguindo
+                </span>
+            </article>
+
+        </div>
+
+        <div class="analysis-notice">
+            <span class="notice-marker"></span>
+
+            <div>
+                <strong>Perfil conectado com sucesso</strong>
+
+                <p>
+                    Nas próximas etapas, o DevAtlas analisará
+                    seus repositórios, tecnologias e documentação.
+                </p>
+            </div>
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="footer">
+    <p>DevAtlas — desenvolvido por Kayque Miguel</p>
+</footer>
+
+</body>
+</html>
