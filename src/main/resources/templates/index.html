@@ -322,6 +322,69 @@
     </section>
 
     <section
+            class="language-analysis"
+            th:if="${languageUsage != null
+        and !#lists.isEmpty(languageUsage)}"
+    >
+        <div class="language-analysis-heading">
+
+            <p class="section-eyebrow">
+                Technology overview
+            </p>
+
+            <h2>Linguagens do perfil</h2>
+
+            <p>
+                Distribuição baseada na linguagem principal
+                detectada em cada projeto.
+            </p>
+
+        </div>
+
+        <div class="language-list">
+
+            <article
+                    class="language-item"
+                    th:each="language : ${languageUsage}"
+            >
+                <div class="language-item-heading">
+
+                    <strong th:text="${language.language}">
+                        Java
+                    </strong>
+
+                    <span>
+                    <span th:text="${language.repositories}">
+                        2
+                    </span>
+
+                    <span
+                            th:text="${language.repositories == 1
+                            ? ' projeto'
+                            : ' projetos'}"
+                    >
+                        projetos
+                    </span>
+
+                    <span th:text="| · ${language.percentage}%|">
+                        · 50%
+                    </span>
+                </span>
+
+                </div>
+
+                <div class="language-progress">
+                <span
+                        th:style="|width: ${language.percentage}%|"
+                ></span>
+                </div>
+
+            </article>
+
+        </div>
+    </section>
+
+    <section
             class="repositories-section"
             th:if="${repositoryAnalyses != null}"
     >

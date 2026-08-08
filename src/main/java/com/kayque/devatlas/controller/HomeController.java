@@ -4,9 +4,11 @@ import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
 import com.kayque.devatlas.model.ProfileAnalysis;
 import com.kayque.devatlas.model.RepositoryAnalysis;
+import com.kayque.devatlas.model.LanguageUsage;
 import com.kayque.devatlas.service.GitHubProfileService;
 import com.kayque.devatlas.service.ProfileAnalysisService;
 import com.kayque.devatlas.service.RepositoryAnalysisService;
+import com.kayque.devatlas.service.LanguageAnalysisService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +27,14 @@ public class HomeController {
     private final ProfileAnalysisService
             profileAnalysisService;
 
+    private final LanguageAnalysisService
+            languageAnalysisService;
+
     public HomeController(
             GitHubProfileService gitHubProfileService,
             RepositoryAnalysisService repositoryAnalysisService,
-            ProfileAnalysisService profileAnalysisService
+            ProfileAnalysisService profileAnalysisService,
+            LanguageAnalysisService languageAnalysisService
     ) {
         this.gitHubProfileService = gitHubProfileService;
 
@@ -37,6 +43,9 @@ public class HomeController {
 
         this.profileAnalysisService =
                 profileAnalysisService;
+
+        this.languageAnalysisService =
+                languageAnalysisService;
     }
 
     @GetMapping("/")
@@ -80,6 +89,11 @@ public class HomeController {
                         )
                         .toList();
 
+        List<LanguageUsage> languageUsage =
+                languageAnalysisService.analyze(
+                        repositories
+                );
+
         ProfileAnalysis profileAnalysis =
                 profileAnalysisService.analyze(
                         repositoryAnalyses
@@ -96,6 +110,11 @@ public class HomeController {
         model.addAttribute(
                 "profileAnalysis",
                 profileAnalysis
+        );
+
+        model.addAttribute(
+                "languageUsage",
+                languageUsage
         );
 
         return "index";
