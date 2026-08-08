@@ -584,6 +584,31 @@ a {
     line-height: 1.45;
 }
 
+.additional-recommendations {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(247, 185, 85, 0.16);
+}
+
+.additional-recommendations  {
+    color: #f7c66f;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.additional-recommendations ul {
+    margin-top: 10px;
+    padding-left: 17px;
+    color: var(--muted);
+}
+
+.additional-recommendations li {
+    margin-top: 7px;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
 .profile-analysis {
     margin-bottom: 32px;
     padding: 30px;

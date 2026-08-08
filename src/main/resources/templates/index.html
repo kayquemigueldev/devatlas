@@ -450,14 +450,51 @@
                 <div
                         class="repository-recommendation"
                         th:if="${!#lists.isEmpty(
-                    analysis.recommendations
-                    )}"
+        analysis.recommendations
+        )}"
                 >
                     <strong>Próxima melhoria</strong>
 
                     <p th:text="${analysis.recommendations[0]}">
                         Adicione informações ao projeto.
                     </p>
+
+                    <details
+                            class="additional-recommendations"
+                            th:if="${#lists.size(
+            analysis.recommendations
+            ) > 1}"
+                    >
+                        <summary
+                                th:if="${#lists.size(
+        analysis.recommendations
+        ) == 2}"
+                        >
+                            Ver mais 1 melhoria
+                        </summary>
+
+                        <summary
+                                th:if="${#lists.size(
+        analysis.recommendations
+        ) > 2}"
+                                th:text="|Ver mais ${#lists.size(
+        analysis.recommendations
+        ) - 1} melhorias|"
+                        >
+                            Ver mais melhorias
+                        </summary>
+
+                        <ul>
+                            <li
+                                    th:each="recommendation, status
+                    : ${analysis.recommendations}"
+                                    th:if="${status.index > 0}"
+                                    th:text="${recommendation}"
+                            >
+                                Outra melhoria encontrada.
+                            </li>
+                        </ul>
+                    </details>
                 </div>
 
                 <div
