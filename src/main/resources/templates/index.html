@@ -220,6 +220,111 @@
 
     </section>
 
+    <section
+            class="repositories-section"
+            th:if="${repositories != null}"
+    >
+        <div class="section-heading">
+
+            <div>
+                <p class="section-eyebrow">
+                    Repository overview
+                </p>
+
+                <h2>Projetos encontrados</h2>
+            </div>
+
+            <span
+                    class="repository-count"
+                    th:text="|${#lists.size(repositories)} projetos|"
+            >
+            0 projetos
+        </span>
+
+        </div>
+
+        <div class="repository-grid">
+
+            <article
+                    class="repository-card"
+                    th:each="repository : ${repositories}"
+            >
+                <div class="repository-card-header">
+
+                <span
+                        class="repository-language"
+                        th:text="${repository.language != null
+                        ? repository.language
+                        : 'Sem linguagem'}"
+                >
+                    Java
+                </span>
+
+                    <span
+                            class="archived-label"
+                            th:if="${repository.archived}"
+                    >
+                    Arquivado
+                </span>
+
+                </div>
+
+                <h3 th:text="${repository.name}">
+                    Nome do projeto
+                </h3>
+
+                <p
+                        class="repository-description"
+                        th:text="${repository.description != null
+                    and !#strings.isEmpty(repository.description)
+                    ? repository.description
+                    : 'Este repositório ainda não possui descrição.'}"
+                >
+                    Descrição do projeto
+                </p>
+
+                <div class="repository-meta">
+                <span th:text="|★ ${repository.stars}|">
+                    ★ 0
+                </span>
+
+                    <span th:text="|Forks ${repository.forks}|">
+                    Forks 0
+                </span>
+
+                    <span th:text="|Issues ${repository.openIssues}|">
+                    Issues 0
+                </span>
+                </div>
+
+                <div
+                        class="repository-topics"
+                        th:if="${repository.topics != null
+                    and !#lists.isEmpty(repository.topics)}"
+                >
+                <span
+                        th:each="topic : ${repository.topics}"
+                        th:text="${topic}"
+                >
+                    spring-boot
+                </span>
+                </div>
+
+                <a
+                        class="repository-link"
+                        th:href="${repository.repositoryUrl}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                >
+                    Ver repositório
+                    <span>↗</span>
+                </a>
+
+            </article>
+
+        </div>
+    </section>
+
 </main>
 
 <footer class="footer">

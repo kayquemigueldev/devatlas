@@ -161,7 +161,7 @@ a {
 }
 
 .profile-card {
-    margin-bottom: 80px;
+    margin-bottom: 32px;
     padding: 30px;
     background: rgba(16, 28, 46, 0.92);
     border: 1px solid var(--border);
@@ -329,6 +329,150 @@ a {
     line-height: 1.5;
 }
 
+.repositories-section {
+    margin-bottom: 80px;
+    padding: 30px;
+    background: rgba(16, 28, 46, 0.65);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+}
+
+.section-heading {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.section-eyebrow {
+    margin-bottom: 7px;
+    color: var(--primary-light);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.section-heading h2 {
+    font-size: 28px;
+    letter-spacing: -0.025em;
+}
+
+.repository-count {
+    padding: 7px 11px;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.repository-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.repository-card {
+    min-width: 0;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    transition:
+            transform 0.2s ease,
+            border-color 0.2s ease;
+}
+
+.repository-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(118, 216, 255, 0.55);
+}
+
+.repository-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.repository-language,
+.archived-label {
+    color: var(--primary-light);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.archived-label {
+    color: #f7b955;
+}
+
+.repository-card h3 {
+    margin-top: 12px;
+    overflow-wrap: anywhere;
+    font-size: 20px;
+}
+
+.repository-description {
+    min-height: 66px;
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.repository-meta {
+    margin-top: 17px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 13px;
+    color: #7f90a7;
+    font-size: 12px;
+}
+
+.repository-topics {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.repository-topics span {
+    padding: 5px 8px;
+    background: rgba(91, 140, 255, 0.1);
+    border: 1px solid rgba(91, 140, 255, 0.22);
+    border-radius: 999px;
+    color: #a9c1ff;
+    font-size: 10px;
+}
+
+.repository-link {
+    margin-top: auto;
+    padding-top: 20px;
+    color: var(--primary-light);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.repository-link span {
+    margin-left: 3px;
+}
+
+@media (max-width: 640px) {
+    .repository-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
 @media (max-width: 640px) {
     .product-label {
         display: none;
@@ -354,5 +498,13 @@ a {
     .avatar {
         width: 92px;
         height: 92px;
+    }
+    .repository-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
