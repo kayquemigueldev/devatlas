@@ -222,21 +222,21 @@
 
     <section
             class="repositories-section"
-            th:if="${repositories != null}"
+            th:if="${repositoryAnalyses != null}"
     >
         <div class="section-heading">
 
             <div>
                 <p class="section-eyebrow">
-                    Repository overview
+                    Repository analysis
                 </p>
 
-                <h2>Projetos encontrados</h2>
+                <h2>Análise dos projetos</h2>
             </div>
 
             <span
                     class="repository-count"
-                    th:text="|${#lists.size(repositories)} projetos|"
+                    th:text="|${#lists.size(repositoryAnalyses)} projetos|"
             >
             0 projetos
         </span>
@@ -247,7 +247,8 @@
 
             <article
                     class="repository-card"
-                    th:each="repository : ${repositories}"
+                    th:each="analysis : ${repositoryAnalyses}"
+                    th:with="repository=${analysis.repository}"
             >
                 <div class="repository-card-header">
 
@@ -260,12 +261,18 @@
                     Java
                 </span>
 
-                    <span
-                            class="archived-label"
-                            th:if="${repository.archived}"
+                    <div
+                            class="repository-score"
+                            th:classappend="| score-${analysis.level.cssClass}|"
                     >
-                    Arquivado
-                </span>
+                        <strong th:text="|${analysis.score}/100|">
+                            85/100
+                        </strong>
+
+                        <span th:text="${analysis.level.label}">
+                        Excelente
+                    </span>
+                    </div>
 
                 </div>
 
@@ -308,6 +315,32 @@
                 >
                     spring-boot
                 </span>
+                </div>
+
+                <div
+                        class="repository-recommendation"
+                        th:if="${!#lists.isEmpty(
+                    analysis.recommendations
+                    )}"
+                >
+                    <strong>Próxima melhoria</strong>
+
+                    <p th:text="${analysis.recommendations[0]}">
+                        Adicione informações ao projeto.
+                    </p>
+                </div>
+
+                <div
+                        class="repository-complete"
+                        th:if="${#lists.isEmpty(
+                    analysis.recommendations
+                    )}"
+                >
+                    <strong>Projeto bem apresentado</strong>
+
+                    <p>
+                        Nenhuma melhoria básica foi identificada.
+                    </p>
                 </div>
 
                 <a
