@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -20,8 +21,11 @@ public class GitHubClient {
 
     private final RestClient restClient;
 
-    public GitHubClient(RestClient.Builder builder) {
-        this.restClient = builder
+    public GitHubClient(
+            RestClient.Builder builder,
+            @Value("${github.token:}") String token
+    ) {
+        RestClient.Builder configuredBuilder = builder
                 .baseUrl(GITHUB_API_URL)
                 .defaultHeader(
                         HttpHeaders.ACCEPT,
@@ -34,8 +38,16 @@ public class GitHubClient {
                 .defaultHeader(
                         "X-GitHub-Api-Version",
                         "2026-03-10"
-                )
-                .build();
+                );
+
+        if (!token.isBlank()) {
+            configuredBuilder.defaultHeader(
+                    HttpHeaders.AUTHORIZATION,
+                    "Bearer " + token
+            );
+        }
+
+        this.restClient = configuredBuilder.build();
     }
 
     public GitHubUserResponse findUser(String username) {
