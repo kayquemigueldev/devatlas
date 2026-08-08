@@ -2,8 +2,10 @@ package com.kayque.devatlas.controller;
 
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
+import com.kayque.devatlas.model.ProfileAnalysis;
 import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.service.GitHubProfileService;
+import com.kayque.devatlas.service.ProfileAnalysisService;
 import com.kayque.devatlas.service.RepositoryAnalysisService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,15 +18,25 @@ import java.util.List;
 public class HomeController {
 
     private final GitHubProfileService gitHubProfileService;
-    private final RepositoryAnalysisService repositoryAnalysisService;
+
+    private final RepositoryAnalysisService
+            repositoryAnalysisService;
+
+    private final ProfileAnalysisService
+            profileAnalysisService;
 
     public HomeController(
             GitHubProfileService gitHubProfileService,
-            RepositoryAnalysisService repositoryAnalysisService
+            RepositoryAnalysisService repositoryAnalysisService,
+            ProfileAnalysisService profileAnalysisService
     ) {
         this.gitHubProfileService = gitHubProfileService;
+
         this.repositoryAnalysisService =
                 repositoryAnalysisService;
+
+        this.profileAnalysisService =
+                profileAnalysisService;
     }
 
     @GetMapping("/")
@@ -59,11 +71,22 @@ public class HomeController {
                         repositories
                 );
 
+        ProfileAnalysis profileAnalysis =
+                profileAnalysisService.analyze(
+                        repositoryAnalyses
+                );
+
         model.addAttribute("username", normalizedUsername);
         model.addAttribute("user", user);
+
         model.addAttribute(
                 "repositoryAnalyses",
                 repositoryAnalyses
+        );
+
+        model.addAttribute(
+                "profileAnalysis",
+                profileAnalysis
         );
 
         return "index";

@@ -221,6 +221,107 @@
     </section>
 
     <section
+            class="profile-analysis"
+            th:if="${profileAnalysis != null}"
+    >
+        <div class="overall-score">
+
+            <p class="score-eyebrow">
+                DevAtlas Score
+            </p>
+
+            <div class="overall-score-value">
+                <strong
+                        th:text="${profileAnalysis.overallScore}"
+                >
+                    78
+                </strong>
+
+                <span>/100</span>
+            </div>
+
+            <span
+                    class="overall-score-level"
+                    th:classappend="| score-${profileAnalysis.level.cssClass}|"
+                    th:text="${profileAnalysis.level.label}"
+            >
+            Bom
+        </span>
+
+        </div>
+
+        <div class="profile-analysis-content">
+
+            <div class="profile-analysis-heading">
+                <p class="section-eyebrow">
+                    Profile overview
+                </p>
+
+                <h2>Visão geral do perfil</h2>
+
+                <p>
+                    Nota calculada pela média dos projetos
+                    públicos analisados.
+                </p>
+            </div>
+
+            <div class="analysis-levels">
+
+                <article class="analysis-level-card">
+                    <span class="level-indicator excellent"></span>
+
+                    <strong
+                            th:text="${profileAnalysis.excellentRepositories}"
+                    >
+                        0
+                    </strong>
+
+                    <p>Excelentes</p>
+                </article>
+
+                <article class="analysis-level-card">
+                    <span class="level-indicator good"></span>
+
+                    <strong
+                            th:text="${profileAnalysis.goodRepositories}"
+                    >
+                        0
+                    </strong>
+
+                    <p>Bons</p>
+                </article>
+
+                <article class="analysis-level-card">
+                    <span class="level-indicator developing"></span>
+
+                    <strong
+                            th:text="${profileAnalysis.developingRepositories}"
+                    >
+                        0
+                    </strong>
+
+                    <p>Em evolução</p>
+                </article>
+
+            </div>
+
+            <div
+                    class="strongest-project"
+                    th:if="${profileAnalysis.strongestRepository != null}"
+            >
+                <span>Projeto com maior pontuação</span>
+
+                <strong
+                        th:text="${profileAnalysis.strongestRepository}"
+                >
+                    investlab
+                </strong>
+            </div>
+
+        </div>
+    </section>
+
+    <section
             class="repositories-section"
             th:if="${repositoryAnalyses != null}"
     >
