@@ -97,6 +97,8 @@ class ProfileAnalysisServiceTests {
                 repository,
                 score,
                 RepositoryScoreLevel.fromScore(score),
+                true,
+                1500,
                 List.of()
         );
     }

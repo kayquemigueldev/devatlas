@@ -55,6 +55,10 @@ public class RepositoryAnalysisService {
                 repository,
                 score,
                 level,
+                readme.isPresent(),
+                readme
+                        .map(GitHubReadmeResponse::size)
+                        .orElse(0),
                 recommendations
         );
     }

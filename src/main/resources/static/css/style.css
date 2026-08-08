@@ -434,6 +434,39 @@ a {
     font-size: 12px;
 }
 
+.repository-readme {
+    margin-top: 14px;
+    display: flex;
+}
+
+.repository-readme span {
+    padding: 5px 9px;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.readme-complete {
+    background: rgba(80, 216, 144, 0.08);
+    border-color: rgba(80, 216, 144, 0.28);
+    color: #73e5a9;
+}
+
+.readme-basic {
+    background: rgba(247, 185, 85, 0.08);
+    border-color: rgba(247, 185, 85, 0.28);
+    color: #f7c66f;
+}
+
+.readme-missing {
+    background: rgba(255, 127, 150, 0.08);
+    border-color: rgba(255, 127, 150, 0.28);
+    color: #ff9bae;
+}
+
 .repository-topics {
     margin-top: 15px;
     display: flex;

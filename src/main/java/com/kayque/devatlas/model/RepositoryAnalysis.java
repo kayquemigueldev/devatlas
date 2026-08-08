@@ -9,6 +9,8 @@ public record RepositoryAnalysis(
         GitHubRepositoryResponse repository,
         int score,
         RepositoryScoreLevel level,
+        boolean readmePresent,
+        int readmeSize,
         List<String> recommendations
 
 ) {

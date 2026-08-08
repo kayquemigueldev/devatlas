@@ -405,6 +405,35 @@
                 </span>
                 </div>
 
+                <div class="repository-readme">
+
+    <span
+            class="readme-complete"
+            th:if="${analysis.readmePresent
+            and analysis.readmeSize >= 1000}"
+            th:text="|README completo · ${analysis.readmeSize} bytes|"
+    >
+        README completo
+    </span>
+
+                    <span
+                            class="readme-basic"
+                            th:if="${analysis.readmePresent
+            and analysis.readmeSize < 1000}"
+                            th:text="|README básico · ${analysis.readmeSize} bytes|"
+                    >
+        README básico
+    </span>
+
+                    <span
+                            class="readme-missing"
+                            th:if="${!analysis.readmePresent}"
+                    >
+        README ausente
+    </span>
+
+                </div>
+
                 <div
                         class="repository-topics"
                         th:if="${repository.topics != null
