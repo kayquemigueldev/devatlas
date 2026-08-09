@@ -4,6 +4,7 @@ import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.model.ProfileAnalysis;
 import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.model.RepositoryScoreLevel;
+import com.kayque.devatlas.model.ReadmeAnalysis;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -93,12 +94,24 @@ class ProfileAnalysisServiceTests {
                         Instant.now()
                 );
 
+        ReadmeAnalysis readmeAnalysis =
+                new ReadmeAnalysis(
+                        true,
+                        1500,
+                        20,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true,
+                        List.of()
+                );
+
         return new RepositoryAnalysis(
                 repository,
                 score,
                 RepositoryScoreLevel.fromScore(score),
-                true,
-                1500,
+                readmeAnalysis,
                 List.of()
         );
     }

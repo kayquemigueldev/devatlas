@@ -455,6 +455,12 @@ a {
     color: #73e5a9;
 }
 
+.readme-good {
+    background: rgba(91, 140, 255, 0.08);
+    border-color: rgba(91, 140, 255, 0.28);
+    color: #a9c1ff;
+}
+
 .readme-basic {
     background: rgba(247, 185, 85, 0.08);
     border-color: rgba(247, 185, 85, 0.28);

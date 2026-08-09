@@ -472,27 +472,37 @@
 
     <span
             class="readme-complete"
-            th:if="${analysis.readmePresent
-            and analysis.readmeSize >= 1000}"
-            th:text="|README completo · ${analysis.readmeSize} bytes|"
+            th:if="${analysis.readmeAnalysis.present
+            and analysis.readmeAnalysis.score == 20}"
+            th:text="|README completo · ${analysis.readmeAnalysis.score}/20|"
     >
-        README completo
+        README completo · 20/20
+    </span>
+
+                    <span
+                            class="readme-good"
+                            th:if="${analysis.readmeAnalysis.present
+            and analysis.readmeAnalysis.score >= 14
+            and analysis.readmeAnalysis.score < 20}"
+                            th:text="|README bom · ${analysis.readmeAnalysis.score}/20|"
+                    >
+        README bom · 17/20
     </span>
 
                     <span
                             class="readme-basic"
-                            th:if="${analysis.readmePresent
-            and analysis.readmeSize < 1000}"
-                            th:text="|README básico · ${analysis.readmeSize} bytes|"
+                            th:if="${analysis.readmeAnalysis.present
+            and analysis.readmeAnalysis.score < 14}"
+                            th:text="|README em evolução · ${analysis.readmeAnalysis.score}/20|"
                     >
-        README básico
+        README em evolução · 8/20
     </span>
 
                     <span
                             class="readme-missing"
-                            th:if="${!analysis.readmePresent}"
+                            th:if="${!analysis.readmeAnalysis.present}"
                     >
-        README ausente
+        README ausente · 0/20
     </span>
 
                 </div>

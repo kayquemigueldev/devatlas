@@ -6,8 +6,10 @@ import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.model.RepositoryScoreLevel;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RepositoryAnalysisServiceTests {
 
     private final RepositoryAnalysisService service =
-            new RepositoryAnalysisService();
+            new RepositoryAnalysisService(
+                    new ReadmeAnalysisService()
+            );
 
     @Test
     void shouldReturnMaximumScoreForCompleteRepository() {
@@ -38,13 +42,10 @@ class RepositoryAnalysisServiceTests {
                         )
                 );
 
-        Optional<GitHubReadmeResponse> readme =
-                createReadme(15937);
-
         RepositoryAnalysis analysis =
                 service.analyze(
                         repository,
-                        readme
+                        createCompleteReadme()
                 );
 
         assertEquals(100, analysis.score());
@@ -52,6 +53,11 @@ class RepositoryAnalysisServiceTests {
         assertEquals(
                 RepositoryScoreLevel.EXCELLENT,
                 analysis.level()
+        );
+
+        assertEquals(
+                20,
+                analysis.readmeAnalysis().score()
         );
 
         assertTrue(
@@ -94,7 +100,7 @@ class RepositoryAnalysisServiceTests {
     }
 
     @Test
-    void shouldRecommendImprovingSmallReadme() {
+    void shouldRecommendImprovingIncompleteReadme() {
         GitHubRepositoryResponse repository =
                 createRepository(
                         "Projeto completo",
@@ -115,31 +121,77 @@ class RepositoryAnalysisServiceTests {
         RepositoryAnalysis analysis =
                 service.analyze(
                         repository,
-                        createReadme(500)
+                        createReadme(
+                                """
+                                # Projeto simples
+
+                                Pequena descrição.
+                                """
+                        )
                 );
 
-        assertEquals(90, analysis.score());
+        assertEquals(88, analysis.score());
 
         assertEquals(
-                1,
+                8,
+                analysis.readmeAnalysis().score()
+        );
+
+        assertEquals(
+                4,
                 analysis.recommendations().size()
         );
 
         assertTrue(
                 analysis.recommendations().contains(
-                        "Amplie o README com instalação, uso e tecnologias."
+                        "Documente como instalar ou preparar o projeto."
                 )
         );
     }
 
+    private Optional<GitHubReadmeResponse>
+    createCompleteReadme() {
+        return createReadme(
+                """
+                # Projeto completo
+
+                ## Tecnologias
+
+                Java, Spring Boot e MySQL.
+
+                ## Instalação
+
+                Instale o Java 21.
+
+                ## Como executar localmente
+
+                Execute a aplicação.
+
+                ![Dashboard](docs/dashboard.png)
+                """
+        );
+    }
+
     private Optional<GitHubReadmeResponse> createReadme(
-            int size
+            String content
     ) {
+        byte[] contentBytes =
+                content.getBytes(
+                        StandardCharsets.UTF_8
+                );
+
+        String encodedContent =
+                Base64
+                        .getEncoder()
+                        .encodeToString(contentBytes);
+
         GitHubReadmeResponse readme =
                 new GitHubReadmeResponse(
                         "README.md",
                         "README.md",
-                        size,
+                        contentBytes.length,
+                        "base64",
+                        encodedContent,
                         "https://github.com/example/project/blob/main/README.md"
                 );
 

@@ -2,6 +2,7 @@ package com.kayque.devatlas.service;
 
 import com.kayque.devatlas.dto.GitHubReadmeResponse;
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
+import com.kayque.devatlas.model.ReadmeAnalysis;
 import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.model.RepositoryScoreLevel;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,16 @@ import java.util.Optional;
 
 @Service
 public class RepositoryAnalysisService {
+
+    private final ReadmeAnalysisService
+            readmeAnalysisService;
+
+    public RepositoryAnalysisService(
+            ReadmeAnalysisService readmeAnalysisService
+    ) {
+        this.readmeAnalysisService =
+                readmeAnalysisService;
+    }
 
     public List<RepositoryAnalysis> analyze(
             List<GitHubRepositoryResponse> repositories
@@ -37,9 +48,14 @@ public class RepositoryAnalysisService {
             GitHubRepositoryResponse repository,
             Optional<GitHubReadmeResponse> readme
     ) {
+        ReadmeAnalysis readmeAnalysis =
+                readmeAnalysisService.analyze(
+                        readme
+                );
+
         int score = calculateScore(
                 repository,
-                readme
+                readmeAnalysis
         );
 
         RepositoryScoreLevel level =
@@ -48,24 +64,21 @@ public class RepositoryAnalysisService {
         List<String> recommendations =
                 createRecommendations(
                         repository,
-                        readme
+                        readmeAnalysis
                 );
 
         return new RepositoryAnalysis(
                 repository,
                 score,
                 level,
-                readme.isPresent(),
-                readme
-                        .map(GitHubReadmeResponse::size)
-                        .orElse(0),
+                readmeAnalysis,
                 recommendations
         );
     }
 
     private int calculateScore(
             GitHubRepositoryResponse repository,
-            Optional<GitHubReadmeResponse> readme
+            ReadmeAnalysis readmeAnalysis
     ) {
         int score = 0;
 
@@ -99,7 +112,7 @@ public class RepositoryAnalysisService {
                 repository.pushedAt()
         );
 
-        score += calculateReadmeScore(readme);
+        score += readmeAnalysis.score();
 
         return score;
     }
@@ -109,10 +122,11 @@ public class RepositoryAnalysisService {
             return 0;
         }
 
-        long daysSinceLastPush = ChronoUnit.DAYS.between(
-                pushedAt,
-                Instant.now()
-        );
+        long daysSinceLastPush =
+                ChronoUnit.DAYS.between(
+                        pushedAt,
+                        Instant.now()
+                );
 
         if (daysSinceLastPush <= 30) {
             return 20;
@@ -133,23 +147,9 @@ public class RepositoryAnalysisService {
         return 0;
     }
 
-    private int calculateReadmeScore(
-            Optional<GitHubReadmeResponse> readme
-    ) {
-        if (readme.isEmpty()) {
-            return 0;
-        }
-
-        if (readme.get().size() >= 1000) {
-            return 20;
-        }
-
-        return 10;
-    }
-
     private List<String> createRecommendations(
             GitHubRepositoryResponse repository,
-            Optional<GitHubReadmeResponse> readme
+            ReadmeAnalysis readmeAnalysis
     ) {
         List<String> recommendations =
                 new ArrayList<>();
@@ -197,15 +197,9 @@ public class RepositoryAnalysisService {
             );
         }
 
-        if (readme.isEmpty()) {
-            recommendations.add(
-                    "Adicione um README para documentar o projeto."
-            );
-        } else if (readme.get().size() < 1000) {
-            recommendations.add(
-                    "Amplie o README com instalação, uso e tecnologias."
-            );
-        }
+        recommendations.addAll(
+                readmeAnalysis.recommendations()
+        );
 
         return List.copyOf(recommendations);
     }

@@ -9,9 +9,27 @@ public record GitHubReadmeResponse(
         String name,
         String path,
         int size,
+        String encoding,
+        String content,
 
         @JsonProperty("html_url")
         String htmlUrl
 
 ) {
+
+        public GitHubReadmeResponse(
+                String name,
+                String path,
+                int size,
+                String htmlUrl
+        ) {
+                this(
+                        name,
+                        path,
+                        size,
+                        null,
+                        null,
+                        htmlUrl
+                );
+        }
 }
