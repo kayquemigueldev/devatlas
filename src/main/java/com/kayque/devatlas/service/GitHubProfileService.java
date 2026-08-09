@@ -5,6 +5,7 @@ import com.kayque.devatlas.dto.GitHubCommitResponse;
 import com.kayque.devatlas.dto.GitHubReadmeResponse;
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -23,12 +24,20 @@ public class GitHubProfileService {
         this.gitHubClient = gitHubClient;
     }
 
+    @Cacheable(
+            cacheNames = "github-users",
+            key = "#username.trim().toLowerCase()"
+    )
     public GitHubUserResponse findUser(
             String username
     ) {
         return gitHubClient.findUser(username);
     }
 
+    @Cacheable(
+            cacheNames = "github-repositories",
+            key = "#username.trim().toLowerCase()"
+    )
     public List<GitHubRepositoryResponse>
     findAnalyzableRepositories(
             String username
@@ -46,6 +55,10 @@ public class GitHubProfileService {
                 .toList();
     }
 
+    @Cacheable(
+            cacheNames = "github-readmes",
+            key = "(#owner.trim() + '/' + #repository.trim()).toLowerCase()"
+    )
     public Optional<GitHubReadmeResponse> findReadme(
             String owner,
             String repository
@@ -56,6 +69,10 @@ public class GitHubProfileService {
         );
     }
 
+    @Cacheable(
+            cacheNames = "github-commits",
+            key = "(#owner.trim() + '/' + #repository.trim()).toLowerCase()"
+    )
     public List<GitHubCommitResponse> findRecentCommits(
             String owner,
             String repository
