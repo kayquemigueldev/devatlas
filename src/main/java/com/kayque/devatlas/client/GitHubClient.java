@@ -2,6 +2,8 @@ package com.kayque.devatlas.client;
 
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
+import com.kayque.devatlas.dto.GitHubReadmeResponse;
+import com.kayque.devatlas.dto.GitHubCommitResponse;
 import com.kayque.devatlas.exception.GitHubApiUnavailableException;
 import com.kayque.devatlas.exception.GitHubUserNotFoundException;
 import org.springframework.http.HttpHeaders;
@@ -10,7 +12,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.beans.factory.annotation.Value;
-import com.kayque.devatlas.dto.GitHubReadmeResponse;
+
+import java.time.Instant;
 
 import java.util.Optional;
 import java.util.List;
@@ -134,6 +137,67 @@ public class GitHubClient {
         } catch (RestClientException exception) {
             throw new GitHubApiUnavailableException(
                     owner,
+                    exception
+            );
+        }
+    }
+
+    public List<GitHubCommitResponse> findRecentCommits(
+            String owner,
+            String repository,
+            Instant since
+    ) {
+        try {
+            GitHubCommitResponse[] commits =
+                    restClient
+                            .get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(
+                                            "/repos/{owner}/{repository}/commits"
+                                    )
+                                    .queryParam(
+                                            "since",
+                                            since.toString()
+                                    )
+                                    .queryParam(
+                                            "per_page",
+                                            100
+                                    )
+                                    .build(
+                                            owner,
+                                            repository
+                                    )
+                            )
+                            .retrieve()
+                            .body(
+                                    GitHubCommitResponse[].class
+                            );
+
+            if (commits == null) {
+                return List.of();
+            }
+
+            return List.of(commits);
+
+        } catch (HttpClientErrorException exception) {
+            int statusCode =
+                    exception
+                            .getStatusCode()
+                            .value();
+
+            if (statusCode == 404
+                    || statusCode == 409) {
+                return List.of();
+            }
+
+            throw new GitHubApiUnavailableException(
+                    owner + "/" + repository,
+                    exception
+            );
+
+        } catch (RestClientException exception) {
+            throw new GitHubApiUnavailableException(
+                    owner + "/" + repository,
                     exception
             );
         }

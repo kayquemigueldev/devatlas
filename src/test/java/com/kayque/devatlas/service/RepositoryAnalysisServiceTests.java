@@ -20,7 +20,8 @@ class RepositoryAnalysisServiceTests {
 
     private final RepositoryAnalysisService service =
             new RepositoryAnalysisService(
-                    new ReadmeAnalysisService()
+                    new ReadmeAnalysisService(),
+                    new RepositoryActivityService()
             );
 
     @Test
@@ -45,10 +46,25 @@ class RepositoryAnalysisServiceTests {
         RepositoryAnalysis analysis =
                 service.analyze(
                         repository,
-                        createCompleteReadme()
+                        createCompleteReadme(),
+                        10
                 );
 
         assertEquals(100, analysis.score());
+
+        assertEquals(
+                10,
+                analysis
+                        .activityAnalysis()
+                        .recentCommitCount()
+        );
+
+        assertEquals(
+                20,
+                analysis
+                        .activityAnalysis()
+                        .score()
+        );
 
         assertEquals(
                 7,
@@ -99,9 +115,9 @@ class RepositoryAnalysisServiceTests {
         RepositoryAnalysis analysis =
                 service.analyze(
                         repository,
-                        Optional.empty()
+                        Optional.empty(),
+                        10
                 );
-
         assertEquals(40, analysis.score());
 
         assertEquals(
@@ -140,10 +156,11 @@ class RepositoryAnalysisServiceTests {
                         createReadme(
                                 """
                                 # Projeto simples
-
+        
                                 Pequena descrição.
                                 """
-                        )
+                        ),
+                        10
                 );
 
         assertEquals(88, analysis.score());

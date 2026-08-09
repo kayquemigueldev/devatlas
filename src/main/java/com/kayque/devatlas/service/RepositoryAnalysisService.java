@@ -2,14 +2,13 @@ package com.kayque.devatlas.service;
 
 import com.kayque.devatlas.dto.GitHubReadmeResponse;
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
+import com.kayque.devatlas.model.ActivityAnalysis;
 import com.kayque.devatlas.model.ReadmeAnalysis;
 import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.model.RepositoryScoreLevel;
 import com.kayque.devatlas.model.ScoreCriterion;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,11 +19,18 @@ public class RepositoryAnalysisService {
     private final ReadmeAnalysisService
             readmeAnalysisService;
 
+    private final RepositoryActivityService
+            repositoryActivityService;
+
     public RepositoryAnalysisService(
-            ReadmeAnalysisService readmeAnalysisService
+            ReadmeAnalysisService readmeAnalysisService,
+            RepositoryActivityService repositoryActivityService
     ) {
         this.readmeAnalysisService =
                 readmeAnalysisService;
+
+        this.repositoryActivityService =
+                repositoryActivityService;
     }
 
     public List<RepositoryAnalysis> analyze(
@@ -41,7 +47,8 @@ public class RepositoryAnalysisService {
     ) {
         return analyze(
                 repository,
-                Optional.empty()
+                Optional.empty(),
+                0
         );
     }
 
@@ -49,15 +56,34 @@ public class RepositoryAnalysisService {
             GitHubRepositoryResponse repository,
             Optional<GitHubReadmeResponse> readme
     ) {
+        return analyze(
+                repository,
+                readme,
+                0
+        );
+    }
+
+    public RepositoryAnalysis analyze(
+            GitHubRepositoryResponse repository,
+            Optional<GitHubReadmeResponse> readme,
+            int recentCommitCount
+    ) {
         ReadmeAnalysis readmeAnalysis =
                 readmeAnalysisService.analyze(
                         readme
                 );
 
+        ActivityAnalysis activityAnalysis =
+                repositoryActivityService.analyze(
+                        repository.pushedAt(),
+                        recentCommitCount
+                );
+
         List<ScoreCriterion> scoreBreakdown =
                 createScoreBreakdown(
                         repository,
-                        readmeAnalysis
+                        readmeAnalysis,
+                        activityAnalysis
                 );
 
         int score =
@@ -72,7 +98,8 @@ public class RepositoryAnalysisService {
         List<String> recommendations =
                 createRecommendations(
                         repository,
-                        readmeAnalysis
+                        readmeAnalysis,
+                        activityAnalysis
                 );
 
         return new RepositoryAnalysis(
@@ -80,15 +107,16 @@ public class RepositoryAnalysisService {
                 score,
                 level,
                 readmeAnalysis,
+                activityAnalysis,
                 scoreBreakdown,
                 recommendations
         );
-
     }
 
     private List<ScoreCriterion> createScoreBreakdown(
             GitHubRepositoryResponse repository,
-            ReadmeAnalysis readmeAnalysis
+            ReadmeAnalysis readmeAnalysis,
+            ActivityAnalysis activityAnalysis
     ) {
         int descriptionScore =
                 hasText(repository.description())
@@ -125,11 +153,6 @@ public class RepositoryAnalysisService {
                         ? 0
                         : 10;
 
-        int activityScore =
-                calculateActivityScore(
-                        repository.pushedAt()
-                );
-
         return List.of(
                 new ScoreCriterion(
                         "Descrição",
@@ -158,7 +181,7 @@ public class RepositoryAnalysisService {
                 ),
                 new ScoreCriterion(
                         "Atividade recente",
-                        activityScore,
+                        activityAnalysis.score(),
                         20
                 ),
                 new ScoreCriterion(
@@ -169,39 +192,10 @@ public class RepositoryAnalysisService {
         );
     }
 
-    private int calculateActivityScore(Instant pushedAt) {
-        if (pushedAt == null) {
-            return 0;
-        }
-
-        long daysSinceLastPush =
-                ChronoUnit.DAYS.between(
-                        pushedAt,
-                        Instant.now()
-                );
-
-        if (daysSinceLastPush <= 30) {
-            return 20;
-        }
-
-        if (daysSinceLastPush <= 90) {
-            return 15;
-        }
-
-        if (daysSinceLastPush <= 180) {
-            return 10;
-        }
-
-        if (daysSinceLastPush <= 365) {
-            return 5;
-        }
-
-        return 0;
-    }
-
     private List<String> createRecommendations(
             GitHubRepositoryResponse repository,
-            ReadmeAnalysis readmeAnalysis
+            ReadmeAnalysis readmeAnalysis,
+            ActivityAnalysis activityAnalysis
     ) {
         List<String> recommendations =
                 new ArrayList<>();
@@ -237,17 +231,9 @@ public class RepositoryAnalysisService {
             );
         }
 
-        if (repository.pushedAt() == null
-                || repository.pushedAt().isBefore(
-                Instant.now().minus(
-                        90,
-                        ChronoUnit.DAYS
-                )
-        )) {
-            recommendations.add(
-                    "Atualize o projeto para demonstrar manutenção."
-            );
-        }
+        recommendations.addAll(
+                activityAnalysis.recommendations()
+        );
 
         recommendations.addAll(
                 readmeAnalysis.recommendations()
@@ -256,7 +242,10 @@ public class RepositoryAnalysisService {
         return List.copyOf(recommendations);
     }
 
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
+    private boolean hasText(
+            String value
+    ) {
+        return value != null
+                && !value.isBlank();
     }
 }

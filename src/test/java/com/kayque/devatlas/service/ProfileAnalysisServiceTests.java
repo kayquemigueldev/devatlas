@@ -5,6 +5,7 @@ import com.kayque.devatlas.model.ProfileAnalysis;
 import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.model.RepositoryScoreLevel;
 import com.kayque.devatlas.model.ReadmeAnalysis;
+import com.kayque.devatlas.model.ActivityAnalysis;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -107,11 +108,22 @@ class ProfileAnalysisServiceTests {
                         List.of()
                 );
 
+        ActivityAnalysis activityAnalysis =
+                new ActivityAnalysis(
+                        10,
+                        10,
+                        10,
+                        20,
+                        "Alta",
+                        List.of()
+                );
+
         return new RepositoryAnalysis(
                 repository,
                 score,
                 RepositoryScoreLevel.fromScore(score),
                 readmeAnalysis,
+                activityAnalysis,
                 List.of(),
                 List.of()
         );

@@ -84,7 +84,13 @@ public class HomeController {
                                         gitHubProfileService.findReadme(
                                                 normalizedUsername,
                                                 repository.name()
-                                        )
+                                        ),
+                                        gitHubProfileService
+                                                .findRecentCommits(
+                                                        normalizedUsername,
+                                                        repository.name()
+                                                )
+                                                .size()
                                 )
                         )
                         .toList();

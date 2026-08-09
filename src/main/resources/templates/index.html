@@ -468,6 +468,43 @@
                 </span>
                 </div>
 
+                    <div
+                            class="repository-activity"
+                            th:classappend="${analysis.activityAnalysis.score >= 16
+        ? ' activity-high'
+        : (analysis.activityAnalysis.score >= 10
+        ? ' activity-moderate'
+        : (analysis.activityAnalysis.score > 0
+        ? ' activity-low'
+        : ' activity-inactive'))}"
+                    >
+    <span
+            class="activity-indicator"
+            aria-hidden="true"
+    ></span>
+
+                        <div>
+                            <strong
+                                    th:text="|Atividade ${analysis.activityAnalysis.label}|"
+                            >
+                                Atividade alta
+                            </strong>
+
+                            <span
+                                    th:text="${analysis.activityAnalysis.recentCommitCount == 1
+                ? '1 commit em 90 dias · '
+                + analysis.activityAnalysis.score
+                + '/20'
+                : analysis.activityAnalysis.recentCommitCount
+                + ' commits em 90 dias · '
+                + analysis.activityAnalysis.score
+                + '/20'}"
+                            >
+            10 commits em 90 dias · 20/20
+        </span>
+                        </div>
+                    </div>
+
                 <div class="repository-readme">
 
     <span
