@@ -507,6 +507,48 @@
 
                 </div>
 
+                <details class="score-breakdown">
+
+                    <summary>
+                        Como a nota foi calculada
+                    </summary>
+
+                    <div class="score-breakdown-list">
+
+                        <div
+                                class="score-criterion"
+                                th:classappend="${criterion.complete
+                ? ' criterion-complete'
+                : ''}"
+                                th:each="criterion
+                : ${analysis.scoreBreakdown}"
+                        >
+                            <div class="score-criterion-heading">
+
+                <span th:text="${criterion.name}">
+                    Descrição
+                </span>
+
+                                <strong
+                                        th:text="|${criterion.score}/${criterion.maximumScore}|"
+                                >
+                                    15/15
+                                </strong>
+
+                            </div>
+
+                            <div class="score-criterion-progress">
+                <span
+                        th:style="|width: ${criterion.percentage}%|"
+                ></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </details>
+
                 <div
                         class="repository-topics"
                         th:if="${repository.topics != null

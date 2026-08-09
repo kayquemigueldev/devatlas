@@ -112,6 +112,7 @@ class ProfileAnalysisServiceTests {
                 score,
                 RepositoryScoreLevel.fromScore(score),
                 readmeAnalysis,
+                List.of(),
                 List.of()
         );
     }

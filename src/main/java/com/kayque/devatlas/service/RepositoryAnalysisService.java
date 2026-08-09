@@ -5,6 +5,7 @@ import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.model.ReadmeAnalysis;
 import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.model.RepositoryScoreLevel;
+import com.kayque.devatlas.model.ScoreCriterion;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -53,10 +54,17 @@ public class RepositoryAnalysisService {
                         readme
                 );
 
-        int score = calculateScore(
-                repository,
-                readmeAnalysis
-        );
+        List<ScoreCriterion> scoreBreakdown =
+                createScoreBreakdown(
+                        repository,
+                        readmeAnalysis
+                );
+
+        int score =
+                scoreBreakdown
+                        .stream()
+                        .mapToInt(ScoreCriterion::score)
+                        .sum();
 
         RepositoryScoreLevel level =
                 RepositoryScoreLevel.fromScore(score);
@@ -72,49 +80,93 @@ public class RepositoryAnalysisService {
                 score,
                 level,
                 readmeAnalysis,
+                scoreBreakdown,
                 recommendations
         );
+
     }
 
-    private int calculateScore(
+    private List<ScoreCriterion> createScoreBreakdown(
             GitHubRepositoryResponse repository,
             ReadmeAnalysis readmeAnalysis
     ) {
-        int score = 0;
+        int descriptionScore =
+                hasText(repository.description())
+                        ? 15
+                        : 0;
 
-        if (hasText(repository.description())) {
-            score += 15;
-        }
+        int topicCount =
+                repository.topics() == null
+                        ? 0
+                        : repository.topics().size();
 
-        int topicCount = repository.topics() == null
-                ? 0
-                : repository.topics().size();
+        int topicsScore;
 
         if (topicCount >= 3) {
-            score += 15;
+            topicsScore = 15;
         } else if (topicCount > 0) {
-            score += 8;
+            topicsScore = 8;
+        } else {
+            topicsScore = 0;
         }
 
-        if (hasText(repository.homepage())) {
-            score += 10;
-        }
+        int homepageScore =
+                hasText(repository.homepage())
+                        ? 10
+                        : 0;
 
-        if (hasText(repository.language())) {
-            score += 10;
-        }
+        int languageScore =
+                hasText(repository.language())
+                        ? 10
+                        : 0;
 
-        if (!repository.archived()) {
-            score += 10;
-        }
+        int projectStatusScore =
+                repository.archived()
+                        ? 0
+                        : 10;
 
-        score += calculateActivityScore(
-                repository.pushedAt()
+        int activityScore =
+                calculateActivityScore(
+                        repository.pushedAt()
+                );
+
+        return List.of(
+                new ScoreCriterion(
+                        "Descrição",
+                        descriptionScore,
+                        15
+                ),
+                new ScoreCriterion(
+                        "Tópicos",
+                        topicsScore,
+                        15
+                ),
+                new ScoreCriterion(
+                        "Deploy",
+                        homepageScore,
+                        10
+                ),
+                new ScoreCriterion(
+                        "Linguagem",
+                        languageScore,
+                        10
+                ),
+                new ScoreCriterion(
+                        "Status do projeto",
+                        projectStatusScore,
+                        10
+                ),
+                new ScoreCriterion(
+                        "Atividade recente",
+                        activityScore,
+                        20
+                ),
+                new ScoreCriterion(
+                        "README",
+                        readmeAnalysis.score(),
+                        20
+                )
         );
-
-        score += readmeAnalysis.score();
-
-        return score;
     }
 
     private int calculateActivityScore(Instant pushedAt) {

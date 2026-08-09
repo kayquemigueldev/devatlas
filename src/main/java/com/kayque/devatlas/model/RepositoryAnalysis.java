@@ -10,6 +10,7 @@ public record RepositoryAnalysis(
         int score,
         RepositoryScoreLevel level,
         ReadmeAnalysis readmeAnalysis,
+        List<ScoreCriterion> scoreBreakdown,
         List<String> recommendations
 
 ) {

@@ -51,6 +51,22 @@ class RepositoryAnalysisServiceTests {
         assertEquals(100, analysis.score());
 
         assertEquals(
+                7,
+                analysis.scoreBreakdown().size()
+        );
+
+        assertEquals(
+                100,
+                analysis
+                        .scoreBreakdown()
+                        .stream()
+                        .mapToInt(criterion ->
+                                criterion.score()
+                        )
+                        .sum()
+        );
+
+        assertEquals(
                 RepositoryScoreLevel.EXCELLENT,
                 analysis.level()
         );
