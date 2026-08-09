@@ -6,11 +6,13 @@ import com.kayque.devatlas.model.LanguageUsage;
 import com.kayque.devatlas.model.ProfileAnalysis;
 import com.kayque.devatlas.model.ProfileRecommendation;
 import com.kayque.devatlas.model.RepositoryAnalysis;
+import com.kayque.devatlas.model.ProfileHistoryEntry;
 import com.kayque.devatlas.service.GitHubProfileService;
 import com.kayque.devatlas.service.LanguageAnalysisService;
 import com.kayque.devatlas.service.ProfileAnalysisService;
 import com.kayque.devatlas.service.ProfileRecommendationService;
 import com.kayque.devatlas.service.RepositoryAnalysisService;
+import com.kayque.devatlas.service.ProfileHistoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,12 +38,16 @@ public class HomeController {
     private final ProfileRecommendationService
             profileRecommendationService;
 
+    private final ProfileHistoryService
+            profileHistoryService;
+
     public HomeController(
             GitHubProfileService gitHubProfileService,
             RepositoryAnalysisService repositoryAnalysisService,
             ProfileAnalysisService profileAnalysisService,
             LanguageAnalysisService languageAnalysisService,
-            ProfileRecommendationService profileRecommendationService
+            ProfileRecommendationService profileRecommendationService,
+            ProfileHistoryService profileHistoryService
     ) {
         this.gitHubProfileService =
                 gitHubProfileService;
@@ -57,6 +63,9 @@ public class HomeController {
 
         this.profileRecommendationService =
                 profileRecommendationService;
+
+        this.profileHistoryService =
+                profileHistoryService;
     }
 
     @GetMapping("/")
@@ -117,6 +126,16 @@ public class HomeController {
                         repositoryAnalyses
                 );
 
+        profileHistoryService.saveIfChanged(
+                normalizedUsername,
+                profileAnalysis
+        );
+
+        List<ProfileHistoryEntry> profileHistory =
+                profileHistoryService.findHistory(
+                        normalizedUsername
+                );
+
         List<ProfileRecommendation> profileRecommendations =
                 profileRecommendationService.analyze(
                         profileAnalysis,
@@ -152,6 +171,11 @@ public class HomeController {
         model.addAttribute(
                 "profileRecommendations",
                 profileRecommendations
+        );
+
+        model.addAttribute(
+                "profileHistory",
+                profileHistory
         );
 
         return "index";

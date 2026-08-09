@@ -322,6 +322,125 @@
     </section>
 
     <section
+            class="profile-history"
+            th:if="${profileHistory != null
+        and !#lists.isEmpty(profileHistory)}"
+    >
+        <div class="history-heading">
+
+            <div>
+                <p class="section-eyebrow">
+                    Analysis history
+                </p>
+
+                <h2>Evolução do perfil</h2>
+
+                <p>
+                    Alterações registradas nas últimas análises
+                    realizadas pelo DevAtlas.
+                </p>
+            </div>
+
+            <span
+                    class="history-count"
+                    th:text="${#lists.size(profileHistory) == 1
+                ? '1 registro'
+                : #lists.size(profileHistory) + ' registros'}"
+            >
+            1 registro
+        </span>
+
+        </div>
+
+        <div class="history-timeline">
+
+            <article
+                    class="history-entry"
+                    th:classappend="${status.first
+                ? ' history-entry-current'
+                : ''}"
+                    th:each="entry, status : ${profileHistory}"
+            >
+                <div class="history-entry-header">
+
+                    <div>
+                    <span
+                            class="history-latest"
+                            th:if="${status.first}"
+                    >
+                        Mais recente
+                    </span>
+
+                        <time
+                                th:datetime="${entry.analyzedAt}"
+                                th:text="${#temporals.format(
+                            entry.analyzedAt,
+                            'dd/MM/yyyy HH:mm',
+                            'America/Sao_Paulo'
+                            )}"
+                        >
+                            09/08/2026 18:30
+                        </time>
+                    </div>
+
+                    <div class="history-score">
+                        <strong th:text="${entry.overallScore}">
+                            84
+                        </strong>
+
+                        <span>/100</span>
+                    </div>
+
+                </div>
+
+                <div class="history-entry-footer">
+
+                <span
+                        class="history-level"
+                        th:classappend="| score-${entry.level.cssClass}|"
+                        th:text="${entry.level.label}"
+                >
+                    Excelente
+                </span>
+
+                    <span
+                            th:text="|${entry.totalRepositories} projetos|"
+                    >
+                    8 projetos
+                </span>
+
+                    <span
+                            th:if="${entry.strongestRepository != null}"
+                            th:text="|Destaque: ${entry.strongestRepository}|"
+                    >
+                    Destaque: investlab
+                </span>
+
+                    <span
+                            class="history-change"
+                            th:classappend="${entry.improved()
+                        ? ' change-positive'
+                        : (entry.declined()
+                        ? ' change-negative'
+                        : ' change-stable')}"
+                            th:text="${!entry.hasPreviousAnalysis()
+                        ? 'Primeiro registro'
+                        : (entry.improved()
+                        ? '+' + entry.scoreChange + ' pontos'
+                        : (entry.declined()
+                        ? entry.scoreChange + ' pontos'
+                        : 'Sem alteração'))}"
+                    >
+                    Primeiro registro
+                </span>
+
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <section
             class="profile-recommendations"
             th:if="${profileRecommendations != null
         and !#lists.isEmpty(profileRecommendations)}"

@@ -843,6 +843,173 @@ a {
     font-size: 13px;
 }
 
+.profile-history {
+    margin-bottom: 32px;
+    padding: 30px;
+    background: rgba(16, 28, 46, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+}
+
+.history-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.history-heading h2 {
+    margin-top: 6px;
+    font-size: 25px;
+}
+
+.history-heading > div > p:last-child {
+    max-width: 570px;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.history-count {
+    padding: 7px 11px;
+    flex-shrink: 0;
+    color: var(--primary-light);
+    background: rgba(91, 140, 255, 0.08);
+    border: 1px solid rgba(91, 140, 255, 0.2);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.history-timeline {
+    margin-top: 24px;
+    display: grid;
+    gap: 12px;
+}
+
+.history-entry {
+    padding: 17px 18px;
+    background: rgba(8, 19, 34, 0.46);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.history-entry-current {
+    background: rgba(91, 140, 255, 0.06);
+    border-color: rgba(91, 140, 255, 0.32);
+}
+
+.history-entry-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.history-entry-header > div:first-child {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.history-latest {
+    padding: 4px 7px;
+    color: var(--primary-light);
+    background: rgba(91, 140, 255, 0.1);
+    border: 1px solid rgba(91, 140, 255, 0.25);
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.history-entry time {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.history-score {
+    display: flex;
+    align-items: baseline;
+    flex-shrink: 0;
+}
+
+.history-score strong {
+    color: var(--text);
+    font-size: 25px;
+}
+
+.history-score span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.history-entry-footer {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.history-entry-footer > span {
+    padding: 5px 8px;
+    color: var(--muted);
+    background: rgba(127, 144, 167, 0.06);
+    border: 1px solid rgba(127, 144, 167, 0.14);
+    border-radius: 999px;
+    font-size: 10px;
+}
+
+.history-level {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.history-level.score-excellent {
+    color: #73e5a9;
+    background: rgba(80, 216, 144, 0.08);
+    border-color: rgba(80, 216, 144, 0.26);
+}
+
+.history-level.score-good {
+    color: #f7c66f;
+    background: rgba(247, 185, 85, 0.08);
+    border-color: rgba(247, 185, 85, 0.26);
+}
+
+.history-level.score-developing {
+    color: #ff9bae;
+    background: rgba(255, 127, 150, 0.08);
+    border-color: rgba(255, 127, 150, 0.26);
+}
+
+.history-change {
+    margin-left: auto;
+    font-weight: 700;
+}
+
+.history-change.change-positive {
+    color: #73e5a9;
+    background: rgba(80, 216, 144, 0.08);
+    border-color: rgba(80, 216, 144, 0.26);
+}
+
+.history-change.change-negative {
+    color: #ff9bae;
+    background: rgba(255, 127, 150, 0.08);
+    border-color: rgba(255, 127, 150, 0.26);
+}
+
+.history-change.change-stable {
+    color: #a9c1ff;
+    background: rgba(91, 140, 255, 0.08);
+    border-color: rgba(91, 140, 255, 0.24);
+}
+
 .profile-recommendations {
     margin-bottom: 32px;
     padding: 30px;
@@ -1045,6 +1212,32 @@ a {
         align-items: flex-start;
         flex-direction: column;
     }
+
+    .profile-history {
+        padding: 23px;
+    }
+
+    .history-heading {
+        flex-direction: column;
+    }
+
+    .history-entry-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .history-entry-footer {
+        align-items: flex-start;
+    }
+
+    .history-change {
+        margin-left: 0;
+    }
+
+    .profile-recommendations {
+        padding: 23px;
+    }
+
     .profile-recommendations {
         padding: 23px;
     }
