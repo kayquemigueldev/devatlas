@@ -322,6 +322,75 @@
     </section>
 
     <section
+            class="profile-recommendations"
+            th:if="${profileRecommendations != null
+        and !#lists.isEmpty(profileRecommendations)}"
+    >
+        <div class="recommendations-heading">
+
+            <div>
+                <p class="section-eyebrow">
+                    Action plan
+                </p>
+
+                <h2>Próximos passos do perfil</h2>
+
+                <p>
+                    Recomendações priorizadas a partir dos dados
+                    encontrados nos projetos.
+                </p>
+            </div>
+
+            <span
+                    class="recommendations-count"
+                    th:text="${#lists.size(profileRecommendations) == 1
+                ? '1 ação'
+                : #lists.size(profileRecommendations) + ' ações'}"
+            >
+            3 ações
+        </span>
+
+        </div>
+
+        <div class="profile-recommendations-list">
+
+            <article
+                    class="profile-recommendation-card"
+                    th:classappend="| priority-${recommendation.priority.cssClass}|"
+                    th:each="recommendation : ${profileRecommendations}"
+            >
+                <div class="recommendation-card-header">
+
+                <span
+                        class="recommendation-category"
+                        th:text="${recommendation.category.label}"
+                >
+                    Documentação
+                </span>
+
+                    <span
+                            class="recommendation-priority"
+                            th:text="|Prioridade ${recommendation.priority.label}|"
+                    >
+                    Prioridade alta
+                </span>
+
+                </div>
+
+                <h3 th:text="${recommendation.title}">
+                    Fortaleça a documentação
+                </h3>
+
+                <p th:text="${recommendation.description}">
+                    Melhore a apresentação dos projetos analisados.
+                </p>
+
+            </article>
+
+        </div>
+    </section>
+
+    <section
             class="language-analysis"
             th:if="${languageUsage != null
         and !#lists.isEmpty(languageUsage)}"

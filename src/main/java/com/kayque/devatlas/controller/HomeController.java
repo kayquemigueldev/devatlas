@@ -2,13 +2,15 @@ package com.kayque.devatlas.controller;
 
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
-import com.kayque.devatlas.model.ProfileAnalysis;
-import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.model.LanguageUsage;
+import com.kayque.devatlas.model.ProfileAnalysis;
+import com.kayque.devatlas.model.ProfileRecommendation;
+import com.kayque.devatlas.model.RepositoryAnalysis;
 import com.kayque.devatlas.service.GitHubProfileService;
-import com.kayque.devatlas.service.ProfileAnalysisService;
-import com.kayque.devatlas.service.RepositoryAnalysisService;
 import com.kayque.devatlas.service.LanguageAnalysisService;
+import com.kayque.devatlas.service.ProfileAnalysisService;
+import com.kayque.devatlas.service.ProfileRecommendationService;
+import com.kayque.devatlas.service.RepositoryAnalysisService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +21,8 @@ import java.util.List;
 @Controller
 public class HomeController {
 
-    private final GitHubProfileService gitHubProfileService;
+    private final GitHubProfileService
+            gitHubProfileService;
 
     private final RepositoryAnalysisService
             repositoryAnalysisService;
@@ -30,13 +33,18 @@ public class HomeController {
     private final LanguageAnalysisService
             languageAnalysisService;
 
+    private final ProfileRecommendationService
+            profileRecommendationService;
+
     public HomeController(
             GitHubProfileService gitHubProfileService,
             RepositoryAnalysisService repositoryAnalysisService,
             ProfileAnalysisService profileAnalysisService,
-            LanguageAnalysisService languageAnalysisService
+            LanguageAnalysisService languageAnalysisService,
+            ProfileRecommendationService profileRecommendationService
     ) {
-        this.gitHubProfileService = gitHubProfileService;
+        this.gitHubProfileService =
+                gitHubProfileService;
 
         this.repositoryAnalysisService =
                 repositoryAnalysisService;
@@ -46,6 +54,9 @@ public class HomeController {
 
         this.languageAnalysisService =
                 languageAnalysisService;
+
+        this.profileRecommendationService =
+                profileRecommendationService;
     }
 
     @GetMapping("/")
@@ -58,7 +69,8 @@ public class HomeController {
             @RequestParam String username,
             Model model
     ) {
-        String normalizedUsername = username.trim();
+        String normalizedUsername =
+                username.trim();
 
         if (normalizedUsername.isEmpty()) {
             return "redirect:/";
@@ -105,8 +117,22 @@ public class HomeController {
                         repositoryAnalyses
                 );
 
-        model.addAttribute("username", normalizedUsername);
-        model.addAttribute("user", user);
+        List<ProfileRecommendation> profileRecommendations =
+                profileRecommendationService.analyze(
+                        profileAnalysis,
+                        repositoryAnalyses,
+                        languageUsage
+                );
+
+        model.addAttribute(
+                "username",
+                normalizedUsername
+        );
+
+        model.addAttribute(
+                "user",
+                user
+        );
 
         model.addAttribute(
                 "repositoryAnalyses",
@@ -121,6 +147,11 @@ public class HomeController {
         model.addAttribute(
                 "languageUsage",
                 languageUsage
+        );
+
+        model.addAttribute(
+                "profileRecommendations",
+                profileRecommendations
         );
 
         return "index";
