@@ -4,9 +4,12 @@ import com.kayque.devatlas.controller.HomeController;
 import com.kayque.devatlas.exception.GitHubApiUnavailableException;
 import com.kayque.devatlas.exception.GitHubUserNotFoundException;
 import com.kayque.devatlas.exception.InvalidGitHubUsernameException;
+import com.kayque.devatlas.exception.AnalysisRateLimitExceededException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.http.HttpStatus;
 
 @ControllerAdvice(assignableTypes = HomeController.class)
 public class HomeExceptionHandler {
@@ -80,6 +83,31 @@ public class HomeExceptionHandler {
                 "Digite um usuário do GitHub com até "
                         + "39 caracteres, usando apenas "
                         + "letras, números e hífens."
+        );
+
+        return "index";
+    }
+
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    @ExceptionHandler(AnalysisRateLimitExceededException.class)
+    public String handleRateLimitExceeded(
+            AnalysisRateLimitExceededException exception,
+            Model model
+    ) {
+        model.addAttribute(
+                "username",
+                exception.getUsername()
+        );
+
+        model.addAttribute(
+                "errorTitle",
+                "Limite de análises atingido"
+        );
+
+        model.addAttribute(
+                "errorMessage",
+                "Você realizou muitas análises em pouco tempo. "
+                        + "Aguarde alguns minutos e tente novamente."
         );
 
         return "index";

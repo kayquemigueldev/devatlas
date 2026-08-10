@@ -18,6 +18,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.kayque.devatlas.validation.GitHubUsernameValidator;
+import com.kayque.devatlas.exception.AnalysisRateLimitExceededException;
+import com.kayque.devatlas.ratelimit.AnalysisRateLimiter;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -45,6 +48,9 @@ public class HomeController {
     private final GitHubUsernameValidator
             gitHubUsernameValidator;
 
+    private final AnalysisRateLimiter
+            analysisRateLimiter;
+
     public HomeController(
             GitHubProfileService gitHubProfileService,
             RepositoryAnalysisService repositoryAnalysisService,
@@ -52,7 +58,8 @@ public class HomeController {
             LanguageAnalysisService languageAnalysisService,
             ProfileRecommendationService profileRecommendationService,
             ProfileHistoryService profileHistoryService,
-            GitHubUsernameValidator gitHubUsernameValidator
+            GitHubUsernameValidator gitHubUsernameValidator,
+            AnalysisRateLimiter analysisRateLimiter
     ) {
         this.gitHubProfileService =
                 gitHubProfileService;
@@ -74,6 +81,9 @@ public class HomeController {
 
         this.gitHubUsernameValidator =
                 gitHubUsernameValidator;
+
+        this.analysisRateLimiter =
+                analysisRateLimiter;
     }
 
     @GetMapping("/")
@@ -84,6 +94,7 @@ public class HomeController {
     @GetMapping("/analisar")
     public String analyzeProfile(
             @RequestParam(defaultValue = "") String username,
+            HttpServletRequest request,
             Model model
     ) {
         String normalizedUsername =
@@ -91,6 +102,14 @@ public class HomeController {
                         .validateAndNormalize(
                                 username
                         );
+
+        if (!analysisRateLimiter.tryAcquire(
+                request.getRemoteAddr()
+        )) {
+            throw new AnalysisRateLimitExceededException(
+                    normalizedUsername
+            );
+        }
 
         GitHubUserResponse user =
                 gitHubProfileService.findUser(
