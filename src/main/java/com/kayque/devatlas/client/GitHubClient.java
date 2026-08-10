@@ -1,58 +1,31 @@
 package com.kayque.devatlas.client;
 
+import com.kayque.devatlas.dto.GitHubCommitResponse;
+import com.kayque.devatlas.dto.GitHubReadmeResponse;
 import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
-import com.kayque.devatlas.dto.GitHubReadmeResponse;
-import com.kayque.devatlas.dto.GitHubCommitResponse;
 import com.kayque.devatlas.exception.GitHubApiUnavailableException;
 import com.kayque.devatlas.exception.GitHubUserNotFoundException;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
-
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class GitHubClient {
 
-    private static final String GITHUB_API_URL =
-            "https://api.github.com";
-
     private final RestClient restClient;
 
     public GitHubClient(
-            RestClient.Builder builder,
-            @Value("${github.token:}") String token
+            @Qualifier("githubRestClient")
+            RestClient restClient
     ) {
-        RestClient.Builder configuredBuilder = builder
-                .baseUrl(GITHUB_API_URL)
-                .defaultHeader(
-                        HttpHeaders.ACCEPT,
-                        "application/vnd.github+json"
-                )
-                .defaultHeader(
-                        HttpHeaders.USER_AGENT,
-                        "DevAtlas"
-                )
-                .defaultHeader(
-                        "X-GitHub-Api-Version",
-                        "2026-03-10"
-                );
-
-        if (!token.isBlank()) {
-            configuredBuilder.defaultHeader(
-                    HttpHeaders.AUTHORIZATION,
-                    "Bearer " + token
-            );
-        }
-
-        this.restClient = configuredBuilder.build();
+        this.restClient = restClient;
     }
 
     public GitHubUserResponse findUser(String username) {
