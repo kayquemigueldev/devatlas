@@ -3,6 +3,7 @@ package com.kayque.devatlas.handler;
 import com.kayque.devatlas.controller.HomeController;
 import com.kayque.devatlas.exception.GitHubApiUnavailableException;
 import com.kayque.devatlas.exception.GitHubUserNotFoundException;
+import com.kayque.devatlas.exception.InvalidGitHubUsernameException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,4 +59,30 @@ public class HomeExceptionHandler {
 
         return "index";
     }
+
+    @ExceptionHandler(InvalidGitHubUsernameException.class)
+    public String handleInvalidUsername(
+            InvalidGitHubUsernameException exception,
+            Model model
+    ) {
+        model.addAttribute(
+                "username",
+                exception.getUsername()
+        );
+
+        model.addAttribute(
+                "errorTitle",
+                "Nome de usuário inválido"
+        );
+
+        model.addAttribute(
+                "errorMessage",
+                "Digite um usuário do GitHub com até "
+                        + "39 caracteres, usando apenas "
+                        + "letras, números e hífens."
+        );
+
+        return "index";
+    }
+
 }

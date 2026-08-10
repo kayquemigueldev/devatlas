@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.kayque.devatlas.validation.GitHubUsernameValidator;
 
 import java.util.List;
 
@@ -41,13 +42,17 @@ public class HomeController {
     private final ProfileHistoryService
             profileHistoryService;
 
+    private final GitHubUsernameValidator
+            gitHubUsernameValidator;
+
     public HomeController(
             GitHubProfileService gitHubProfileService,
             RepositoryAnalysisService repositoryAnalysisService,
             ProfileAnalysisService profileAnalysisService,
             LanguageAnalysisService languageAnalysisService,
             ProfileRecommendationService profileRecommendationService,
-            ProfileHistoryService profileHistoryService
+            ProfileHistoryService profileHistoryService,
+            GitHubUsernameValidator gitHubUsernameValidator
     ) {
         this.gitHubProfileService =
                 gitHubProfileService;
@@ -66,6 +71,9 @@ public class HomeController {
 
         this.profileHistoryService =
                 profileHistoryService;
+
+        this.gitHubUsernameValidator =
+                gitHubUsernameValidator;
     }
 
     @GetMapping("/")
@@ -75,15 +83,14 @@ public class HomeController {
 
     @GetMapping("/analisar")
     public String analyzeProfile(
-            @RequestParam String username,
+            @RequestParam(defaultValue = "") String username,
             Model model
     ) {
         String normalizedUsername =
-                username.trim();
-
-        if (normalizedUsername.isEmpty()) {
-            return "redirect:/";
-        }
+                gitHubUsernameValidator
+                        .validateAndNormalize(
+                                username
+                        );
 
         GitHubUserResponse user =
                 gitHubProfileService.findUser(
