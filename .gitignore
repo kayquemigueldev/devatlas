@@ -33,4 +33,12 @@ build/
 .vscode/
 
 
+### Local environment and database ###
+
+.env
+.env.*
+!.env.example
+
 /data/
+*.mv.db
+*.trace.db
