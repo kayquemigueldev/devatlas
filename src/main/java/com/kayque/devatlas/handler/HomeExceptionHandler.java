@@ -5,6 +5,7 @@ import com.kayque.devatlas.exception.GitHubApiUnavailableException;
 import com.kayque.devatlas.exception.GitHubUserNotFoundException;
 import com.kayque.devatlas.exception.InvalidGitHubUsernameException;
 import com.kayque.devatlas.exception.AnalysisRateLimitExceededException;
+import com.kayque.devatlas.exception.GitHubRateLimitExceededException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -108,6 +109,32 @@ public class HomeExceptionHandler {
                 "errorMessage",
                 "Você realizou muitas análises em pouco tempo. "
                         + "Aguarde alguns minutos e tente novamente."
+        );
+
+        return "index";
+    }
+
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(GitHubRateLimitExceededException.class)
+    public String handleGitHubRateLimitExceeded(
+            GitHubRateLimitExceededException exception,
+            Model model
+    ) {
+        model.addAttribute(
+                "username",
+                exception.getUsername()
+        );
+
+        model.addAttribute(
+                "errorTitle",
+                "Limite do GitHub atingido"
+        );
+
+        model.addAttribute(
+                "errorMessage",
+                "O limite temporário de consultas da API do GitHub "
+                        + "foi atingido. Aguarde alguns minutos "
+                        + "e tente novamente."
         );
 
         return "index";

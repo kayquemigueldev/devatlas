@@ -6,6 +6,7 @@ import com.kayque.devatlas.dto.GitHubRepositoryResponse;
 import com.kayque.devatlas.dto.GitHubUserResponse;
 import com.kayque.devatlas.exception.GitHubApiUnavailableException;
 import com.kayque.devatlas.exception.GitHubUserNotFoundException;
+import com.kayque.devatlas.exception.GitHubRateLimitExceededException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -15,6 +16,7 @@ import org.springframework.web.client.RestClientException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Locale;
 
 @Component
 public class GitHubClient {
@@ -38,6 +40,12 @@ public class GitHubClient {
 
         } catch (HttpClientErrorException.NotFound exception) {
             throw new GitHubUserNotFoundException(username);
+
+        } catch (HttpClientErrorException exception) {
+            throw translateClientError(
+                    username,
+                    exception
+            );
 
         } catch (RestClientException exception) {
             throw new GitHubApiUnavailableException(
@@ -78,6 +86,12 @@ public class GitHubClient {
         } catch (HttpClientErrorException.NotFound exception) {
             throw new GitHubUserNotFoundException(username);
 
+        } catch (HttpClientErrorException exception) {
+            throw translateClientError(
+                    username,
+                    exception
+            );
+
         } catch (RestClientException exception) {
             throw new GitHubApiUnavailableException(
                     username,
@@ -106,6 +120,12 @@ public class GitHubClient {
 
         } catch (HttpClientErrorException.NotFound exception) {
             return Optional.empty();
+
+        } catch (HttpClientErrorException exception) {
+            throw translateClientError(
+                    owner,
+                    exception
+            );
 
         } catch (RestClientException exception) {
             throw new GitHubApiUnavailableException(
@@ -163,8 +183,8 @@ public class GitHubClient {
                 return List.of();
             }
 
-            throw new GitHubApiUnavailableException(
-                    owner + "/" + repository,
+            throw translateClientError(
+                    owner,
                     exception
             );
 
@@ -174,6 +194,60 @@ public class GitHubClient {
                     exception
             );
         }
+    }
+
+    private RuntimeException translateClientError(
+            String username,
+            HttpClientErrorException exception
+    ) {
+        if (isRateLimitExceeded(exception)) {
+            return new GitHubRateLimitExceededException(
+                    username,
+                    exception
+            );
+        }
+
+        return new GitHubApiUnavailableException(
+                username,
+                exception
+        );
+    }
+
+    private boolean isRateLimitExceeded(
+            HttpClientErrorException exception
+    ) {
+        int statusCode =
+                exception
+                        .getStatusCode()
+                        .value();
+
+        if (statusCode == 429) {
+            return true;
+        }
+
+        if (statusCode != 403) {
+            return false;
+        }
+
+        String remainingRequests =
+                Optional
+                        .ofNullable(
+                                exception.getResponseHeaders()
+                        )
+                        .map(headers ->
+                                headers.getFirst(
+                                        "X-RateLimit-Remaining"
+                                )
+                        )
+                        .orElse(null);
+
+        String responseBody =
+                exception
+                        .getResponseBodyAsString()
+                        .toLowerCase(Locale.ROOT);
+
+        return "0".equals(remainingRequests)
+                || responseBody.contains("rate limit");
     }
 
 }
