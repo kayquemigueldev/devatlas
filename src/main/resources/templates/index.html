@@ -561,11 +561,15 @@
 
                 </div>
 
-                <div class="language-progress">
-                <span
-                        th:style="|width: ${language.percentage}%|"
-                ></span>
-                </div>
+                <progress
+                        class="language-progress"
+                        th:value="${language.percentage}"
+                        value="50"
+                        max="100"
+                        th:attr="aria-label=|${language.language}: ${language.percentage}%|"
+                >
+                    50%
+                </progress>
 
             </article>
 
@@ -762,11 +766,15 @@
 
                             </div>
 
-                            <div class="score-criterion-progress">
-                <span
-                        th:style="|width: ${criterion.percentage}%|"
-                ></span>
-                            </div>
+                            <progress
+                                    class="score-criterion-progress"
+                                    th:value="${criterion.percentage}"
+                                    value="50"
+                                    max="100"
+                                    th:attr="aria-label=|${criterion.name}: ${criterion.percentage}%|"
+                            >
+                                50%
+                            </progress>
 
                         </div>
 
