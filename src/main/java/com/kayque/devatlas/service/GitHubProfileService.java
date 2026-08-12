@@ -16,6 +16,9 @@ import java.util.Optional;
 @Service
 public class GitHubProfileService {
 
+    private static final int MAX_ANALYZABLE_REPOSITORIES =
+            25;
+
     private final GitHubClient gitHubClient;
 
     public GitHubProfileService(
@@ -52,8 +55,12 @@ public class GitHubProfileService {
                 .filter(repository ->
                         !repository.fork()
                 )
+                .limit(
+                        MAX_ANALYZABLE_REPOSITORIES
+                )
                 .toList();
     }
+
 
     @Cacheable(
             cacheNames = "github-readmes",
